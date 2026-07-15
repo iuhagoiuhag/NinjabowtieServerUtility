@@ -9,6 +9,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ModConfig {
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("nsu.json");
@@ -16,12 +18,7 @@ public class ModConfig {
 
     private static ModConfig INSTANCE = new ModConfig();
 
-    public String key1 = "[";
-    public String command1 = "/ah";
-    public String key2 = "]";
-    public String command2 = "/rtp";
-    public String key3 = "\\";
-    public String command3 = "/home";
+    public Map<String, String> binds = new LinkedHashMap<>();
 
     public static void load() {
         if (Files.exists(CONFIG_PATH)) {
@@ -30,6 +27,12 @@ public class ModConfig {
             } catch (IOException e) {
                 System.err.println("[NSU] Failed to load config: " + e.getMessage());
             }
+        }
+        if (INSTANCE.binds == null || INSTANCE.binds.isEmpty()) {
+            INSTANCE.binds = new LinkedHashMap<>();
+            INSTANCE.binds.put("[", "/ah");
+            INSTANCE.binds.put("]", "/rtp");
+            INSTANCE.binds.put("\\", "/home");
         }
         save();
     }

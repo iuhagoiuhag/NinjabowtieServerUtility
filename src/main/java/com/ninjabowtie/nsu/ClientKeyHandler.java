@@ -9,48 +9,48 @@ import net.minecraft.client.gui.Gui;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ClientKeyHandler {
-    private static KeyMapping kb1, kb2, kb3;
+    private static final Map<Integer, String> KEY_MAP = new HashMap<>();
+    private static final Map<Integer, KeyMapping> KEYBINDINGS = new HashMap<>();
     private static Method guiScreenMethod;
     private static boolean tickRegistered = false;
 
     public static void register() {
         ModConfig config = ModConfig.get();
 
-        int key1 = getKeyCode(config.key1);
-        int key2 = getKeyCode(config.key2);
-        int key3 = getKeyCode(config.key3);
+        int index = 0;
+        for (Map.Entry<String, String> entry : config.binds.entrySet()) {
+            index++;
+            int keyCode = getKeyCode(entry.getKey());
 
-        kb1 = KeyMappingHelper.registerKeyMapping(
-            new KeyMapping("key.nsu.command1", InputConstants.Type.KEYSYM, key1, KeyMapping.Category.MISC));
+            KeyMapping kb = KeyMappingHelper.registerKeyMapping(
+                new KeyMapping("key.nsu.command" + index, InputConstants.Type.KEYSYM, keyCode, KeyMapping.Category.MISC));
 
-        kb2 = KeyMappingHelper.registerKeyMapping(
-            new KeyMapping("key.nsu.command2", InputConstants.Type.KEYSYM, key2, KeyMapping.Category.MISC));
-
-        kb3 = KeyMappingHelper.registerKeyMapping(
-            new KeyMapping("key.nsu.command3", InputConstants.Type.KEYSYM, key3, KeyMapping.Category.MISC));
+            KEYBINDINGS.put(keyCode, kb);
+            KEY_MAP.put(keyCode, entry.getValue());
+        }
 
         if (!tickRegistered) {
             tickRegistered = true;
-
             try {
                 guiScreenMethod = Gui.class.getMethod("screen");
             } catch (NoSuchMethodException ignored) {}
 
             ClientTickEvents.END_CLIENT_TICK.register(client -> {
                 if (client.player == null || hasScreen(client)) return;
-                ModConfig cfg = ModConfig.get();
-                checkAndSend(client, kb1, cfg.command1);
-                checkAndSend(client, kb2, cfg.command2);
-                checkAndSend(client, kb3, cfg.command3);
-            });
-        }
-    }
 
-    private static void checkAndSend(Minecraft client, KeyMapping kb, String command) {
-        if (kb.consumeClick() && command != null && !command.isEmpty()) {
-            client.player.connection.sendCommand(command.startsWith("/") ? command.substring(1) : command);
+                for (Map.Entry<Integer, KeyMapping> entry : KEYBINDINGS.entrySet()) {
+                    if (entry.getValue().consumeClick()) {
+                        String command = KEY_MAP.get(entry.getKey());
+                        if (command != null && !command.isEmpty()) {
+                            client.player.connection.sendCommand(command.startsWith("/") ? command.substring(1) : command);
+                        }
+                    }
+                }
+            });
         }
     }
 
