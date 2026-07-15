@@ -5,14 +5,17 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import org.lwjgl.glfw.GLFW;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ClientKeyHandler {
     private static final Map<Integer, String> KEY_MAP = new HashMap<>();
     private static final Map<Integer, KeyMapping> KEYBINDINGS = new HashMap<>();
+    private static Method guiScreenMethod;
 
     public static void register() {
         ModConfig config = ModConfig.get();
@@ -37,8 +40,12 @@ public class ClientKeyHandler {
         KEY_MAP.put(key2, config.command2);
         KEY_MAP.put(key3, config.command3);
 
+        try {
+            guiScreenMethod = Gui.class.getMethod("screen");
+        } catch (NoSuchMethodException ignored) {}
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client.player == null || client.screen != null) return;
+            if (client.player == null || hasScreen(client)) return;
 
             for (Map.Entry<Integer, KeyMapping> entry : KEYBINDINGS.entrySet()) {
                 if (entry.getValue().consumeClick()) {
@@ -49,6 +56,17 @@ public class ClientKeyHandler {
                 }
             }
         });
+    }
+
+    private static boolean hasScreen(Minecraft client) {
+        if (guiScreenMethod != null) {
+            try {
+                return guiScreenMethod.invoke(client.gui) != null;
+            } catch (Exception ignored) {
+                return true;
+            }
+        }
+        return client.screen != null;
     }
 
     private static int getKeyCode(String keyName) {
