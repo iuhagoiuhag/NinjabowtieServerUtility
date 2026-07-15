@@ -11,7 +11,7 @@
     "homepage": "https://github.com/ninjabowtie/ninjabowtie-server-utility",
     "sources": "https://github.com/ninjabowtie/ninjabowtie-server-utility"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "icon": "",
   "environment": "client",
   "entrypoints": {

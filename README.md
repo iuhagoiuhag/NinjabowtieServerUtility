@@ -33,4 +33,4 @@ The built jar will be in `build/libs/`.
 
 ## License
 
-MIT
+Apache 2.0
