@@ -1,0 +1,94 @@
+package com.ninjabowtie.nsu;
+
+import com.mojang.blaze3d.platform.InputConstants;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class ClientKeyHandler {
+    private static final Map<Integer, String> KEY_MAP = new HashMap<>();
+    private static final Map<Integer, KeyMapping> KEYBINDINGS = new HashMap<>();
+
+    public static void register() {
+        ModConfig config = ModConfig.get();
+
+        int key1 = getKeyCode(config.key1);
+        int key2 = getKeyCode(config.key2);
+        int key3 = getKeyCode(config.key3);
+
+        KeyMapping kb1 = KeyMappingHelper.registerKeyMapping(
+            new KeyMapping("key.nsu.command1", InputConstants.Type.KEYSYM, key1, KeyMapping.Category.MISC));
+
+        KeyMapping kb2 = KeyMappingHelper.registerKeyMapping(
+            new KeyMapping("key.nsu.command2", InputConstants.Type.KEYSYM, key2, KeyMapping.Category.MISC));
+
+        KeyMapping kb3 = KeyMappingHelper.registerKeyMapping(
+            new KeyMapping("key.nsu.command3", InputConstants.Type.KEYSYM, key3, KeyMapping.Category.MISC));
+
+        KEYBINDINGS.put(key1, kb1);
+        KEYBINDINGS.put(key2, kb2);
+        KEYBINDINGS.put(key3, kb3);
+        KEY_MAP.put(key1, config.command1);
+        KEY_MAP.put(key2, config.command2);
+        KEY_MAP.put(key3, config.command3);
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.player == null || client.gui.screen() != null) return;
+
+            for (Map.Entry<Integer, KeyMapping> entry : KEYBINDINGS.entrySet()) {
+                if (entry.getValue().consumeClick()) {
+                    String command = KEY_MAP.get(entry.getKey());
+                    if (command != null && !command.isEmpty()) {
+                        client.player.connection.sendCommand(command.startsWith("/") ? command.substring(1) : command);
+                    }
+                }
+            }
+        });
+    }
+
+    private static int getKeyCode(String keyName) {
+        return switch (keyName.toUpperCase()) {
+            case "[" -> GLFW.GLFW_KEY_LEFT_BRACKET;
+            case "]" -> GLFW.GLFW_KEY_RIGHT_BRACKET;
+            case "\\" -> GLFW.GLFW_KEY_BACKSLASH;
+            case "-" -> GLFW.GLFW_KEY_MINUS;
+            case "=" -> GLFW.GLFW_KEY_EQUAL;
+            case "SPACE" -> GLFW.GLFW_KEY_SPACE;
+            case "SHIFT" -> GLFW.GLFW_KEY_LEFT_SHIFT;
+            case "CTRL" -> GLFW.GLFW_KEY_LEFT_CONTROL;
+            case "ALT" -> GLFW.GLFW_KEY_LEFT_ALT;
+            case "TAB" -> GLFW.GLFW_KEY_TAB;
+            case "ENTER" -> GLFW.GLFW_KEY_ENTER;
+            case "BACKSPACE" -> GLFW.GLFW_KEY_BACKSPACE;
+            case "DELETE" -> GLFW.GLFW_KEY_DELETE;
+            case "INSERT" -> GLFW.GLFW_KEY_INSERT;
+            case "HOME" -> GLFW.GLFW_KEY_HOME;
+            case "END" -> GLFW.GLFW_KEY_END;
+            case "PAGEUP" -> GLFW.GLFW_KEY_PAGE_UP;
+            case "PAGEDOWN" -> GLFW.GLFW_KEY_PAGE_DOWN;
+            case "F1" -> GLFW.GLFW_KEY_F1;
+            case "F2" -> GLFW.GLFW_KEY_F2;
+            case "F3" -> GLFW.GLFW_KEY_F3;
+            case "F4" -> GLFW.GLFW_KEY_F4;
+            case "F5" -> GLFW.GLFW_KEY_F5;
+            case "F6" -> GLFW.GLFW_KEY_F6;
+            case "F7" -> GLFW.GLFW_KEY_F7;
+            case "F8" -> GLFW.GLFW_KEY_F8;
+            case "F9" -> GLFW.GLFW_KEY_F9;
+            case "F10" -> GLFW.GLFW_KEY_F10;
+            case "F11" -> GLFW.GLFW_KEY_F11;
+            case "F12" -> GLFW.GLFW_KEY_F12;
+            default -> {
+                if (keyName.length() == 1) {
+                    yield keyName.charAt(0);
+                }
+                yield GLFW.GLFW_KEY_UNKNOWN;
+            }
+        };
+    }
+}
