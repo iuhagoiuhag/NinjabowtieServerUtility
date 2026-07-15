@@ -38,7 +38,7 @@ public class ClientKeyHandler {
         KEY_MAP.put(key3, config.command3);
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client.player == null || client.gui.screen() != null) return;
+            if (client.player == null || client.screen != null) return;
 
             for (Map.Entry<Integer, KeyMapping> entry : KEYBINDINGS.entrySet()) {
                 if (entry.getValue().consumeClick()) {
