@@ -34,3 +34,7 @@ The built jar will be in `build/libs/`.
 ## License
 
 Apache 2.0
+
+## Credits
+
+Icon by [Magnific](https://www.flaticon.com/free-icons/gears) on Flaticon.
