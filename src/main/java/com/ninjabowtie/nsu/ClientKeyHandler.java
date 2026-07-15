@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ClientKeyHandler {
-    private static final Map<Integer, String> KEY_MAP = new HashMap<>();
     private static final Map<Integer, KeyMapping> KEYBINDINGS = new HashMap<>();
     private static Method guiScreenMethod;
     private static boolean tickRegistered = false;
@@ -30,7 +29,6 @@ public class ClientKeyHandler {
                 new KeyMapping("key.nsu.command" + index, InputConstants.Type.KEYSYM, keyCode, KeyMapping.Category.MISC));
 
             KEYBINDINGS.put(keyCode, kb);
-            KEY_MAP.put(keyCode, entry.getValue());
         }
 
         if (!tickRegistered) {
@@ -42,9 +40,11 @@ public class ClientKeyHandler {
             ClientTickEvents.END_CLIENT_TICK.register(client -> {
                 if (client.player == null || hasScreen(client)) return;
 
-                for (Map.Entry<Integer, KeyMapping> entry : KEYBINDINGS.entrySet()) {
-                    if (entry.getValue().consumeClick()) {
-                        String command = KEY_MAP.get(entry.getKey());
+                for (Map.Entry<String, String> entry : ModConfig.get().binds.entrySet()) {
+                    int keyCode = getKeyCode(entry.getKey());
+                    KeyMapping kb = KEYBINDINGS.get(keyCode);
+                    if (kb != null && kb.consumeClick()) {
+                        String command = entry.getValue();
                         if (command != null && !command.isEmpty()) {
                             client.player.connection.sendCommand(command.startsWith("/") ? command.substring(1) : command);
                         }
