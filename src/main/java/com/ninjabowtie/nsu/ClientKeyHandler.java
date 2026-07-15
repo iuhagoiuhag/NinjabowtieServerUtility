@@ -9,13 +9,11 @@ import net.minecraft.client.gui.Gui;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ClientKeyHandler {
-    private static final Map<Integer, String> KEY_MAP = new HashMap<>();
-    private static final Map<Integer, KeyMapping> KEYBINDINGS = new HashMap<>();
+    private static KeyMapping kb1, kb2, kb3;
     private static Method guiScreenMethod;
+    private static boolean tickRegistered = false;
 
     public static void register() {
         ModConfig config = ModConfig.get();
@@ -24,38 +22,36 @@ public class ClientKeyHandler {
         int key2 = getKeyCode(config.key2);
         int key3 = getKeyCode(config.key3);
 
-        KeyMapping kb1 = KeyMappingHelper.registerKeyMapping(
+        kb1 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping("key.nsu.command1", InputConstants.Type.KEYSYM, key1, KeyMapping.Category.MISC));
 
-        KeyMapping kb2 = KeyMappingHelper.registerKeyMapping(
+        kb2 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping("key.nsu.command2", InputConstants.Type.KEYSYM, key2, KeyMapping.Category.MISC));
 
-        KeyMapping kb3 = KeyMappingHelper.registerKeyMapping(
+        kb3 = KeyMappingHelper.registerKeyMapping(
             new KeyMapping("key.nsu.command3", InputConstants.Type.KEYSYM, key3, KeyMapping.Category.MISC));
 
-        KEYBINDINGS.put(key1, kb1);
-        KEYBINDINGS.put(key2, kb2);
-        KEYBINDINGS.put(key3, kb3);
-        KEY_MAP.put(key1, config.command1);
-        KEY_MAP.put(key2, config.command2);
-        KEY_MAP.put(key3, config.command3);
+        if (!tickRegistered) {
+            tickRegistered = true;
 
-        try {
-            guiScreenMethod = Gui.class.getMethod("screen");
-        } catch (NoSuchMethodException ignored) {}
+            try {
+                guiScreenMethod = Gui.class.getMethod("screen");
+            } catch (NoSuchMethodException ignored) {}
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client.player == null || hasScreen(client)) return;
+            ClientTickEvents.END_CLIENT_TICK.register(client -> {
+                if (client.player == null || hasScreen(client)) return;
+                ModConfig cfg = ModConfig.get();
+                checkAndSend(client, kb1, cfg.command1);
+                checkAndSend(client, kb2, cfg.command2);
+                checkAndSend(client, kb3, cfg.command3);
+            });
+        }
+    }
 
-            for (Map.Entry<Integer, KeyMapping> entry : KEYBINDINGS.entrySet()) {
-                if (entry.getValue().consumeClick()) {
-                    String command = KEY_MAP.get(entry.getKey());
-                    if (command != null && !command.isEmpty()) {
-                        client.player.connection.sendCommand(command.startsWith("/") ? command.substring(1) : command);
-                    }
-                }
-            }
-        });
+    private static void checkAndSend(Minecraft client, KeyMapping kb, String command) {
+        if (kb.consumeClick() && command != null && !command.isEmpty()) {
+            client.player.connection.sendCommand(command.startsWith("/") ? command.substring(1) : command);
+        }
     }
 
     private static boolean hasScreen(Minecraft client) {

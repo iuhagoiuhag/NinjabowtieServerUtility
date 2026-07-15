@@ -20,6 +20,9 @@
     ]
   },
   "mixins": [],
+  "modmenu": [
+    "com.ninjabowtie.nsu.ModMenuIntegration"
+  ],
   "depends": {
     "fabricloader": ">=0.19.0",
     "minecraft": ">=26.1.2",
