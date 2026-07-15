@@ -9,36 +9,48 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 
-public class NsuConfigScreen extends Screen {
-    private static final int BINDINGS = 3;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+public class NsuConfigScreen extends Screen {
     private final Screen parent;
+    private final List<String> keys = new ArrayList<>();
+    private final List<String> commands = new ArrayList<>();
     private EditBox[] commandFields;
     private Button[] keyButtons;
     private int selectedKeyIndex = -1;
-    private String[] keys;
-    private String[] commands;
 
     protected NsuConfigScreen(Screen parent) {
         super(Component.translatable("nsu.config.title"));
         this.parent = parent;
         ModConfig config = ModConfig.get();
-        keys = new String[]{config.key1, config.key2, config.key3};
-        commands = new String[]{config.command1, config.command2, config.command3};
+        for (Map.Entry<String, String> entry : config.binds.entrySet()) {
+            keys.add(entry.getKey());
+            commands.add(entry.getValue());
+        }
+    }
+
+    private NsuConfigScreen(Screen parent, List<String> keys, List<String> commands) {
+        super(Component.translatable("nsu.config.title"));
+        this.parent = parent;
+        this.keys.addAll(keys);
+        this.commands.addAll(commands);
     }
 
     @Override
     protected void init() {
-        commandFields = new EditBox[BINDINGS];
-        keyButtons = new Button[BINDINGS];
+        int count = keys.size();
+        commandFields = new EditBox[count];
+        keyButtons = new Button[count];
         int centerX = width / 2;
 
-        for (int i = 0; i < BINDINGS; i++) {
+        for (int i = 0; i < count; i++) {
             int y = 50 + i * 30;
             int idx = i;
 
             keyButtons[i] = Button.builder(
-                Component.literal("Key " + (i + 1) + ": " + keys[i]),
+                Component.literal("Key " + (i + 1) + ": " + keys.get(i)),
                 btn -> startKeyCapture(idx)
             )
             .bounds(centerX - 155, y, 120, 20)
@@ -49,24 +61,41 @@ public class NsuConfigScreen extends Screen {
                 font, centerX - 25, y, 180, 20,
                 Component.translatable("nsu.command" + (i + 1))
             );
-            commandFields[i].setValue(commands[i]);
+            commandFields[i].setValue(commands.get(i));
             commandFields[i].setMaxLength(256);
             addRenderableWidget(commandFields[i]);
         }
+
+        int addY = 50 + count * 30;
+        addRenderableWidget(Button.builder(
+            Component.literal("+ Add Bind"),
+            btn -> addBind()
+        )
+        .bounds(centerX - 95, addY, 190, 20)
+        .build());
 
         addRenderableWidget(Button.builder(
             Component.translatable("nsu.save"),
             btn -> saveAndClose()
         )
-        .bounds(centerX - 95, 150, 90, 20)
+        .bounds(centerX - 95, addY + 30, 90, 20)
         .build());
 
         addRenderableWidget(Button.builder(
             Component.translatable("nsu.cancel"),
             btn -> onClose()
         )
-        .bounds(centerX + 5, 150, 90, 20)
+        .bounds(centerX + 5, addY + 30, 90, 20)
         .build());
+    }
+
+    private void addBind() {
+        for (int i = 0; i < commandFields.length; i++) {
+            commands.set(i, commandFields[i].getValue());
+        }
+        keys.add("");
+        commands.add("");
+        Minecraft.getInstance().setScreen(new NsuConfigScreen(parent, keys, commands));
     }
 
     private void startKeyCapture(int index) {
@@ -79,18 +108,16 @@ public class NsuConfigScreen extends Screen {
         if (selectedKeyIndex >= 0) {
             int keyCode = event.key();
             if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-                keyButtons[selectedKeyIndex].setMessage(
-                    Component.literal("Key " + (selectedKeyIndex + 1) + ": " + keys[selectedKeyIndex])
-                );
+                String msg = "Key " + (selectedKeyIndex + 1) + ": " + keys.get(selectedKeyIndex);
+                keyButtons[selectedKeyIndex].setMessage(Component.literal(msg));
                 selectedKeyIndex = -1;
                 return true;
             }
             String keyName = glfwKeyToName(keyCode);
             if (keyName != null) {
-                keys[selectedKeyIndex] = keyName;
-                keyButtons[selectedKeyIndex].setMessage(
-                    Component.literal("Key " + (selectedKeyIndex + 1) + ": " + keyName)
-                );
+                keys.set(selectedKeyIndex, keyName);
+                String msg = "Key " + (selectedKeyIndex + 1) + ": " + keyName;
+                keyButtons[selectedKeyIndex].setMessage(Component.literal(msg));
             }
             selectedKeyIndex = -1;
             return true;
@@ -101,25 +128,24 @@ public class NsuConfigScreen extends Screen {
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean captured) {
         if (selectedKeyIndex >= 0) {
-            keyButtons[selectedKeyIndex].setMessage(
-                Component.literal("Key " + (selectedKeyIndex + 1) + ": " + keys[selectedKeyIndex])
-            );
+            String msg = "Key " + (selectedKeyIndex + 1) + ": " + keys.get(selectedKeyIndex);
+            keyButtons[selectedKeyIndex].setMessage(Component.literal(msg));
             selectedKeyIndex = -1;
         }
         return super.mouseClicked(event, captured);
     }
 
     private void saveAndClose() {
-        for (int i = 0; i < BINDINGS; i++) {
-            commands[i] = commandFields[i].getValue();
+        for (int i = 0; i < keys.size(); i++) {
+            commands.set(i, commandFields[i].getValue());
         }
         ModConfig config = ModConfig.get();
-        config.key1 = keys[0];
-        config.command1 = commands[0];
-        config.key2 = keys[1];
-        config.command2 = commands[1];
-        config.key3 = keys[2];
-        config.command3 = commands[2];
+        config.binds.clear();
+        for (int i = 0; i < keys.size(); i++) {
+            if (!keys.get(i).isEmpty()) {
+                config.binds.put(keys.get(i), commands.get(i));
+            }
+        }
         ModConfig.save();
         ClientKeyHandler.register();
         onClose();
