@@ -54,6 +54,11 @@ public class ClientKeyHandler {
                 if (index <= KEYBINDINGS.size()) {
                     KeyMapping kb = KEYBINDINGS.get(index - 1);
                     kb.setKey(InputConstants.Type.KEYSYM.getOrCreate(getKeyCode(entry.getKey())));
+                } else {
+                    int keyCode = getKeyCode(entry.getKey());
+                    KeyMapping kb = KeyMappingHelper.registerKeyMapping(
+                        new KeyMapping("key.nsu.command" + index, InputConstants.Type.KEYSYM, keyCode, KeyMapping.Category.MISC));
+                    KEYBINDINGS.add(kb);
                 }
             }
             for (int i = index; i < KEYBINDINGS.size(); i++) {
