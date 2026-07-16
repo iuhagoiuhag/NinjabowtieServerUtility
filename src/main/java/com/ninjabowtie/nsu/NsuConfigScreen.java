@@ -175,10 +175,19 @@ public class NsuConfigScreen extends Screen {
             case GLFW.GLFW_KEY_BACKSLASH -> "\\";
             case GLFW.GLFW_KEY_MINUS -> "-";
             case GLFW.GLFW_KEY_EQUAL -> "=";
+            case GLFW.GLFW_KEY_COMMA -> ",";
+            case GLFW.GLFW_KEY_PERIOD -> ".";
+            case GLFW.GLFW_KEY_SLASH -> "/";
+            case GLFW.GLFW_KEY_SEMICOLON -> ";";
+            case GLFW.GLFW_KEY_APOSTROPHE -> "'";
+            case GLFW.GLFW_KEY_GRAVE_ACCENT -> "`";
             case GLFW.GLFW_KEY_SPACE -> "SPACE";
             case GLFW.GLFW_KEY_LEFT_SHIFT -> "SHIFT";
+            case GLFW.GLFW_KEY_RIGHT_SHIFT -> "SHIFT";
             case GLFW.GLFW_KEY_LEFT_CONTROL -> "CTRL";
+            case GLFW.GLFW_KEY_RIGHT_CONTROL -> "CTRL";
             case GLFW.GLFW_KEY_LEFT_ALT -> "ALT";
+            case GLFW.GLFW_KEY_RIGHT_ALT -> "ALT";
             case GLFW.GLFW_KEY_TAB -> "TAB";
             case GLFW.GLFW_KEY_ENTER -> "ENTER";
             case GLFW.GLFW_KEY_BACKSPACE -> "BACKSPACE";
@@ -188,6 +197,13 @@ public class NsuConfigScreen extends Screen {
             case GLFW.GLFW_KEY_END -> "END";
             case GLFW.GLFW_KEY_PAGE_UP -> "PAGEUP";
             case GLFW.GLFW_KEY_PAGE_DOWN -> "PAGEDOWN";
+            case GLFW.GLFW_KEY_UP -> "UP";
+            case GLFW.GLFW_KEY_DOWN -> "DOWN";
+            case GLFW.GLFW_KEY_LEFT -> "LEFT";
+            case GLFW.GLFW_KEY_RIGHT -> "RIGHT";
+            case GLFW.GLFW_KEY_CAPS_LOCK -> "CAPS_LOCK";
+            case GLFW.GLFW_KEY_NUM_LOCK -> "NUM_LOCK";
+            case GLFW.GLFW_KEY_SCROLL_LOCK -> "SCROLL_LOCK";
             case GLFW.GLFW_KEY_F1 -> "F1";
             case GLFW.GLFW_KEY_F2 -> "F2";
             case GLFW.GLFW_KEY_F3 -> "F3";
@@ -200,6 +216,7 @@ public class NsuConfigScreen extends Screen {
             case GLFW.GLFW_KEY_F10 -> "F10";
             case GLFW.GLFW_KEY_F11 -> "F11";
             case GLFW.GLFW_KEY_F12 -> "F12";
+            case GLFW.GLFW_KEY_MENU -> "MENU";
             default -> null;
         };
     }
