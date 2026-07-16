@@ -1,27 +1,36 @@
 # Ninjabowtie Server Utility (NSU)
 
-A Minecraft Fabric mod that lets you bind keys to execute chat commands instantly.
+A Minecraft Fabric client mod that lets you bind keys to execute chat commands instantly.
 
 ## Features
 
-- Bind up to 3 keys to execute any chat command
-- Configure keys and commands in the config file
+- Bind any number of keys to execute chat commands
+- In-game config screen via ModMenu (Mods > NSU > Config)
 - Works entirely client-side
+
+## Requirements
+
+- Minecraft 26.2+
+- Java 25+
+- Fabric Loader 0.19+
+- Fabric API
+- ModMenu (for in-game config)
 
 ## Configuration
 
-The config file is located at `.minecraft/config/nsu.json`. It is automatically created after first launch.
+The config file is located at `.minecraft/config/nsu.json`. It is automatically created after first launch with default binds.
 
 ```json
 {
-  "key1": "[",
-  "command1": "/ah",
-  "key2": "]",
-  "command2": "/rtp",
-  "key3": "\\",
-  "command3": "/home"
+  "binds": {
+    "[": "/ah",
+    "]": "/rtp",
+    "\\": "/home"
+  }
 }
 ```
+
+You can also configure binds in-game through ModMenu without editing the file directly.
 
 ## Building
 
