@@ -31,11 +31,9 @@ public class NsuConfigScreen extends Screen {
         }
     }
 
-    private NsuConfigScreen(Screen parent, List<String> keys, List<String> commands) {
-        super(Component.translatable("nsu.config.title"));
-        this.parent = parent;
-        this.keys.addAll(keys);
-        this.commands.addAll(commands);
+    @Override
+    public void onClose() {
+        Minecraft.getInstance().setScreenAndShow(this.parent);
     }
 
     @Override
@@ -75,7 +73,7 @@ public class NsuConfigScreen extends Screen {
         .build());
 
         addRenderableWidget(Button.builder(
-            Component.translatable("nsu.save"),
+            Component.translatable("nsu.done"),
             btn -> saveAndClose()
         )
         .bounds(centerX - 95, addY + 30, 90, 20)
@@ -95,7 +93,8 @@ public class NsuConfigScreen extends Screen {
         }
         keys.add("");
         commands.add("");
-        Minecraft.getInstance().setScreen(new NsuConfigScreen(parent, keys, commands));
+        clearWidgets();
+        init();
     }
 
     private void startKeyCapture(int index) {
@@ -108,18 +107,20 @@ public class NsuConfigScreen extends Screen {
         if (selectedKeyIndex >= 0) {
             int keyCode = event.key();
             if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-                String msg = "Key " + (selectedKeyIndex + 1) + ": " + keys.get(selectedKeyIndex);
-                keyButtons[selectedKeyIndex].setMessage(Component.literal(msg));
                 selectedKeyIndex = -1;
+                updateKeyButtonTexts();
                 return true;
             }
             String keyName = glfwKeyToName(keyCode);
             if (keyName != null) {
                 keys.set(selectedKeyIndex, keyName);
-                String msg = "Key " + (selectedKeyIndex + 1) + ": " + keyName;
-                keyButtons[selectedKeyIndex].setMessage(Component.literal(msg));
             }
             selectedKeyIndex = -1;
+            updateKeyButtonTexts();
+            return true;
+        }
+        if (event.key() == GLFW.GLFW_KEY_ESCAPE) {
+            onClose();
             return true;
         }
         return super.keyPressed(event);
@@ -128,11 +129,17 @@ public class NsuConfigScreen extends Screen {
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean captured) {
         if (selectedKeyIndex >= 0) {
-            String msg = "Key " + (selectedKeyIndex + 1) + ": " + keys.get(selectedKeyIndex);
-            keyButtons[selectedKeyIndex].setMessage(Component.literal(msg));
             selectedKeyIndex = -1;
+            updateKeyButtonTexts();
         }
         return super.mouseClicked(event, captured);
+    }
+
+    private void updateKeyButtonTexts() {
+        for (int i = 0; i < keyButtons.length; i++) {
+            String msg = "Key " + (i + 1) + ": " + keys.get(i);
+            keyButtons[i].setMessage(Component.literal(msg));
+        }
     }
 
     private void saveAndClose() {
@@ -147,13 +154,12 @@ public class NsuConfigScreen extends Screen {
             }
         }
         ModConfig.save();
-        ClientKeyHandler.register();
+        try {
+            ClientKeyHandler.register();
+        } catch (Exception e) {
+            System.err.println("[NSU] Failed to re-register keybindings: " + e.getMessage());
+        }
         onClose();
-    }
-
-    @Override
-    public void onClose() {
-        Minecraft.getInstance().setScreen(parent);
     }
 
     private static String glfwKeyToName(int keyCode) {
