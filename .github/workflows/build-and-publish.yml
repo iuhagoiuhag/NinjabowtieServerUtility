@@ -39,8 +39,6 @@ jobs:
           name: Ninjabowtie Server Utility ${{ env.MOD_VERSION }}
           version: ${{ env.MOD_VERSION }}
           changelog: ${{ github.event.inputs.changelog }}
-          game-versions: |
-            ${{ env.MC_VERSION }}
-            26.2
+          game-versions: ${{ env.MC_VERSION }}
           loaders: fabric
           java: ${{ env.JAVA_VERSION }}
