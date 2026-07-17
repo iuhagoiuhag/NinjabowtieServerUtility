@@ -109,12 +109,11 @@ public class NsuConfigScreen extends Screen {
             if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
                 selectedKeyIndex = -1;
                 updateKeyButtonTexts();
-                return true;
+                return super.keyPressed(event);
             }
             String keyName = glfwKeyToName(keyCode);
-            if (keyName != null) {
-                keys.set(selectedKeyIndex, keyName);
-            }
+            if (keyName == null) return true;
+            keys.set(selectedKeyIndex, keyName);
             selectedKeyIndex = -1;
             updateKeyButtonTexts();
             return true;
@@ -177,19 +176,23 @@ public class NsuConfigScreen extends Screen {
             case GLFW.GLFW_KEY_EQUAL -> "=";
             case GLFW.GLFW_KEY_COMMA -> ",";
             case GLFW.GLFW_KEY_PERIOD -> ".";
-            case GLFW.GLFW_KEY_SLASH -> "/";
             case GLFW.GLFW_KEY_SEMICOLON -> ";";
             case GLFW.GLFW_KEY_APOSTROPHE -> "'";
+            case GLFW.GLFW_KEY_SLASH -> "/";
             case GLFW.GLFW_KEY_GRAVE_ACCENT -> "`";
             case GLFW.GLFW_KEY_SPACE -> "SPACE";
             case GLFW.GLFW_KEY_LEFT_SHIFT -> "SHIFT";
-            case GLFW.GLFW_KEY_RIGHT_SHIFT -> "SHIFT";
+            case GLFW.GLFW_KEY_RIGHT_SHIFT -> "RSHIFT";
             case GLFW.GLFW_KEY_LEFT_CONTROL -> "CTRL";
-            case GLFW.GLFW_KEY_RIGHT_CONTROL -> "CTRL";
+            case GLFW.GLFW_KEY_RIGHT_CONTROL -> "RCTRL";
             case GLFW.GLFW_KEY_LEFT_ALT -> "ALT";
-            case GLFW.GLFW_KEY_RIGHT_ALT -> "ALT";
+            case GLFW.GLFW_KEY_RIGHT_ALT -> "RALT";
             case GLFW.GLFW_KEY_TAB -> "TAB";
             case GLFW.GLFW_KEY_ENTER -> "ENTER";
+            case GLFW.GLFW_KEY_CAPS_LOCK -> "CAPSLOCK";
+            case GLFW.GLFW_KEY_NUM_LOCK -> "NUMLOCK";
+            case GLFW.GLFW_KEY_SCROLL_LOCK -> "SCROLLLOCK";
+            case GLFW.GLFW_KEY_PAUSE -> "PAUSE";
             case GLFW.GLFW_KEY_BACKSPACE -> "BACKSPACE";
             case GLFW.GLFW_KEY_DELETE -> "DELETE";
             case GLFW.GLFW_KEY_INSERT -> "INSERT";
@@ -201,9 +204,6 @@ public class NsuConfigScreen extends Screen {
             case GLFW.GLFW_KEY_DOWN -> "DOWN";
             case GLFW.GLFW_KEY_LEFT -> "LEFT";
             case GLFW.GLFW_KEY_RIGHT -> "RIGHT";
-            case GLFW.GLFW_KEY_CAPS_LOCK -> "CAPS_LOCK";
-            case GLFW.GLFW_KEY_NUM_LOCK -> "NUM_LOCK";
-            case GLFW.GLFW_KEY_SCROLL_LOCK -> "SCROLL_LOCK";
             case GLFW.GLFW_KEY_F1 -> "F1";
             case GLFW.GLFW_KEY_F2 -> "F2";
             case GLFW.GLFW_KEY_F3 -> "F3";

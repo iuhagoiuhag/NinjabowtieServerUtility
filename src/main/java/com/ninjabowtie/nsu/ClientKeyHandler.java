@@ -87,7 +87,7 @@ public class ClientKeyHandler {
                 for (Map.Entry<KeyMapping, String> entry : KEY_COMMANDS.entrySet()) {
                     if (entry.getKey().consumeClick()) {
                         String command = entry.getValue();
-                        if (command != null && !command.isEmpty()) {
+                        if (command != null && !command.isEmpty() && client.player.connection != null) {
                             client.player.connection.sendCommand(command.startsWith("/") ? command.substring(1) : command);
                         }
                     }
@@ -114,53 +114,57 @@ public class ClientKeyHandler {
 
     private static int getKeyCode(String keyName) {
         return switch (keyName.toUpperCase()) {
-            case "[" -> 91; // GLFW.GLFW_KEY_LEFT_BRACKET
-            case "]" -> 93; // GLFW.GLFW_KEY_RIGHT_BRACKET
-            case "\\" -> 92; // GLFW.GLFW_KEY_BACKSLASH
-            case "-" -> 45; // GLFW.GLFW_KEY_MINUS
-            case "=" -> 61; // GLFW.GLFW_KEY_EQUAL
-            case "SPACE" -> 32; // GLFW.GLFW_KEY_SPACE
-            case "SHIFT" -> 340; // GLFW.GLFW_KEY_LEFT_SHIFT
-            case "CTRL" -> 341; // GLFW.GLFW_KEY_LEFT_CONTROL
-            case "ALT" -> 342; // GLFW.GLFW_KEY_LEFT_ALT
-            case "TAB" -> 258; // GLFW.GLFW_KEY_TAB
-            case "ENTER" -> 257; // GLFW.GLFW_KEY_ENTER
-            case "BACKSPACE" -> 259; // GLFW.GLFW_KEY_BACKSPACE
-            case "DELETE" -> 261; // GLFW.GLFW_KEY_DELETE
-            case "INSERT" -> 260; // GLFW.GLFW_KEY_INSERT
-            case "HOME" -> 268; // GLFW.GLFW_KEY_HOME
-            case "END" -> 269; // GLFW.GLFW_KEY_END
-            case "PAGEUP" -> 266; // GLFW.GLFW_KEY_PAGE_UP
-            case "PAGEDOWN" -> 267; // GLFW.GLFW_KEY_PAGE_DOWN
-            case "F1" -> 290; // GLFW.GLFW_KEY_F1
-            case "F2" -> 291; // GLFW.GLFW_KEY_F2
-            case "F3" -> 292; // GLFW.GLFW_KEY_F3
-            case "F4" -> 293; // GLFW.GLFW_KEY_F4
-            case "F5" -> 294; // GLFW.GLFW_KEY_F5
-            case "F6" -> 295; // GLFW.GLFW_KEY_F6
-            case "F7" -> 296; // GLFW.GLFW_KEY_F7
-            case "F8" -> 297; // GLFW.GLFW_KEY_F8
-            case "F9" -> 298; // GLFW.GLFW_KEY_F9
-            case "F10" -> 299; // GLFW.GLFW_KEY_F10
-            case "F11" -> 300; // GLFW.GLFW_KEY_F11
-            case "F12" -> 301; // GLFW.GLFW_KEY_F12
-            case "," -> 44; // GLFW.GLFW_KEY_COMMA
-            case "." -> 46; // GLFW.GLFW_KEY_PERIOD
-            case "/" -> 47; // GLFW.GLFW_KEY_SLASH
-            case ";" -> 59; // GLFW.GLFW_KEY_SEMICOLON
-            case "'" -> 39; // GLFW.GLFW_KEY_APOSTROPHE
-            case "`" -> 96; // GLFW.GLFW_KEY_GRAVE_ACCENT
-            case "UP" -> 265; // GLFW.GLFW_KEY_UP
-            case "DOWN" -> 264; // GLFW.GLFW_KEY_DOWN
-            case "LEFT" -> 263; // GLFW.GLFW_KEY_LEFT
-            case "RIGHT" -> 262; // GLFW.GLFW_KEY_RIGHT
-            case "CAPS_LOCK" -> 280; // GLFW.GLFW_KEY_CAPS_LOCK
-            case "NUM_LOCK" -> 282; // GLFW.GLFW_KEY_NUM_LOCK
-            case "SCROLL_LOCK" -> 281; // GLFW.GLFW_KEY_SCROLL_LOCK
-            case "MENU" -> 348; // GLFW.GLFW_KEY_MENU
+            case "[" -> 91;
+            case "]" -> 93;
+            case "\\" -> 92;
+            case "-" -> 45;
+            case "=" -> 61;
+            case "," -> 44;
+            case "." -> 46;
+            case ";" -> 59;
+            case "'" -> 39;
+            case "/" -> 47;
+            case "`" -> 96;
+            case "SPACE" -> 32;
+            case "SHIFT" -> 340;
+            case "RSHIFT" -> 344;
+            case "CTRL" -> 341;
+            case "RCTRL" -> 345;
+            case "ALT" -> 342;
+            case "RALT" -> 346;
+            case "TAB" -> 258;
+            case "ENTER" -> 257;
+            case "CAPSLOCK" -> 280;
+            case "NUMLOCK" -> 282;
+            case "SCROLLLOCK" -> 281;
+            case "PAUSE" -> 284;
+            case "BACKSPACE" -> 259;
+            case "DELETE" -> 261;
+            case "INSERT" -> 260;
+            case "HOME" -> 268;
+            case "END" -> 269;
+            case "PAGEUP" -> 266;
+            case "PAGEDOWN" -> 267;
+            case "UP" -> 265;
+            case "DOWN" -> 264;
+            case "LEFT" -> 263;
+            case "RIGHT" -> 262;
+            case "MENU" -> 348;
+            case "F1" -> 290;
+            case "F2" -> 291;
+            case "F3" -> 292;
+            case "F4" -> 293;
+            case "F5" -> 294;
+            case "F6" -> 295;
+            case "F7" -> 296;
+            case "F8" -> 297;
+            case "F9" -> 298;
+            case "F10" -> 299;
+            case "F11" -> 300;
+            case "F12" -> 301;
             default -> {
                 if (keyName.length() == 1) {
-                    yield keyName.charAt(0);
+                    yield keyName.toUpperCase().charAt(0);
                 }
                 yield -1; // GLFW.GLFW_KEY_UNKNOWN
             }

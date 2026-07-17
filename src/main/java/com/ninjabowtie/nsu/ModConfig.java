@@ -2,6 +2,7 @@ package com.ninjabowtie.nsu;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
@@ -23,8 +24,11 @@ public class ModConfig {
     public static void load() {
         if (Files.exists(CONFIG_PATH)) {
             try (Reader reader = Files.newBufferedReader(CONFIG_PATH)) {
-                INSTANCE = GSON.fromJson(reader, ModConfig.class);
-            } catch (IOException e) {
+                ModConfig loaded = GSON.fromJson(reader, ModConfig.class);
+                if (loaded != null && loaded.binds != null) {
+                    INSTANCE.binds = loaded.binds;
+                }
+            } catch (IOException | JsonSyntaxException e) {
                 System.err.println("[NSU] Failed to load config: " + e.getMessage());
             }
         }
