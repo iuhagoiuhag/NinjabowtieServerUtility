@@ -57,7 +57,7 @@ public class NsuConfigScreen extends Screen {
 
             commandFields[i] = new EditBox(
                 font, centerX - 25, y, 180, 20,
-                Component.translatable("nsu.command" + (i + 1))
+                Component.literal("Command " + (i + 1))
             );
             commandFields[i].setValue(commands.get(i));
             commandFields[i].setMaxLength(256);
