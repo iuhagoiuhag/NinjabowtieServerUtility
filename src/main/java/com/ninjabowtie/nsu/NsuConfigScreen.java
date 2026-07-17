@@ -19,6 +19,7 @@ public class NsuConfigScreen extends Screen {
     private final List<String> commands = new ArrayList<>();
     private EditBox[] commandFields;
     private Button[] keyButtons;
+    private Button[] removeButtons;
     private int selectedKeyIndex = -1;
 
     protected NsuConfigScreen(Screen parent) {
@@ -41,6 +42,7 @@ public class NsuConfigScreen extends Screen {
         int count = keys.size();
         commandFields = new EditBox[count];
         keyButtons = new Button[count];
+        removeButtons = new Button[count];
         int centerX = width / 2;
 
         for (int i = 0; i < count; i++) {
@@ -51,12 +53,20 @@ public class NsuConfigScreen extends Screen {
                 Component.literal("Key " + (i + 1) + ": " + keys.get(i)),
                 btn -> startKeyCapture(idx)
             )
-            .bounds(centerX - 155, y, 120, 20)
+            .bounds(centerX - 155, y, 100, 20)
             .build();
             addRenderableWidget(keyButtons[i]);
 
+            removeButtons[i] = Button.builder(
+                Component.translatable("nsu.remove"),
+                btn -> removeBind(idx)
+            )
+            .bounds(centerX - 45, y, 50, 20)
+            .build();
+            addRenderableWidget(removeButtons[i]);
+
             commandFields[i] = new EditBox(
-                font, centerX - 25, y, 180, 20,
+                font, centerX + 15, y, 140, 20,
                 Component.literal("Command " + (i + 1))
             );
             commandFields[i].setValue(commands.get(i));
@@ -93,6 +103,13 @@ public class NsuConfigScreen extends Screen {
         }
         keys.add("");
         commands.add("");
+        clearWidgets();
+        init();
+    }
+
+    private void removeBind(int index) {
+        keys.remove(index);
+        commands.remove(index);
         clearWidgets();
         init();
     }

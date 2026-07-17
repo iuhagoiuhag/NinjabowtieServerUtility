@@ -1,5 +1,6 @@
 {
     "nsu.config.title": "NSU Configuration",
     "nsu.done": "Done",
-    "nsu.cancel": "Cancel"
+    "nsu.cancel": "Cancel",
+    "nsu.remove": "Remove"
 }
